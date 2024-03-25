@@ -6,8 +6,11 @@ import { usePathname } from "next/navigation";
 import { ElementRef, useEffect, useRef, useState } from "react";
 import { useMediaQuery } from 'usehooks-ts';
 import { UserItem } from "./user-item";
+import axios from 'axios';
+import { useUser } from "@clerk/clerk-react";
 
 export const Navigation = () => {
+    const { user } = useUser();
     const pathname = usePathname();
     const isMobile = useMediaQuery("(max-width: 768px)");
 
@@ -16,6 +19,23 @@ export const Navigation = () => {
     const navbarRef = useRef<ElementRef<"div">>(null);
     const [isResetting, setIsResetting] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(isMobile);
+    const [alldocument, setAllDocument] = useState([])
+
+    useEffect(() => {
+        const allDocument = async () => {
+            const userId = user?.id;
+            try {
+                const res = await axios.post('http://localhost:3000/api/document/alldocument',{userId})
+                console.log(res.data.data);
+                setAllDocument(res.data.data)
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        allDocument()
+    },[])
+
+    // console.log(alldocument);
 
     useEffect(() => {
         if (isMobile) {
@@ -115,7 +135,11 @@ export const Navigation = () => {
                     <UserItem />
                 </div>
                 <div className="mt-4">
-                    <p>Documents</p>
+                    {alldocument?.map((document) => (
+                        <p key={document.id}>
+                            {document.title}
+                        </p>
+                    ))}
                 </div>
                 <div 
                     onMouseDown={handleMouseDown} 
