@@ -4,7 +4,6 @@ import { NextApiRequest, NextApiResponse} from 'next';
 export default async function alldocument(req: NextApiRequest, res: NextApiResponse) {
     try {
         const { userId } = req.body
-        console.log(userId);
         
         // fetch document data
         const alldocumnet = await Document.findAll({ where: {userId: userId}})
